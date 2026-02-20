@@ -137,7 +137,7 @@ ADEuresys::ADEuresys(const char *portName, const char* cameraId, int numEGBuffer
     epicsSnprintf(driverVersionString, sizeof(driverVersionString), "%d.%d.%d", 
                   DRIVER_VERSION, DRIVER_REVISION, DRIVER_MODIFICATION);
     setStringParam(NDDriverVersion,driverVersionString);
-    setStringParam(ADSDKVersion, Euresys::Internal::EGrabberClientVersion);
+    setStringParam(ADSDKVersion, Euresys::Internal::EGrabberApiVersion);
     resetErrorCounts();
     
     // shutdown on exit
