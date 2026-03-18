@@ -2,6 +2,7 @@
 #define ADEURESYS_H
 
 #include <epicsEvent.h>
+#include <memory>
 
 #include <ADGenICam.h>
 #include <EGrabber.h>
@@ -29,21 +30,28 @@ typedef EGrabber<CallbackSingleThread> EGRABBER_CALLBACK;
 class ADEuresys : public ADGenICam
 {
 public:
+    // Legacy constructor for backward compatibility - ignores cameraId and uses interface 0, device 0
     ADEuresys(const char *portName, const char* cameraId, int numESBuffers,
               size_t maxMemory, int priority, int stackSize);
+
+    // New constructor with explicit interface and device indices
+    ADEuresys(const char *portName, int interfaceIndex, int deviceIndex,
+              int numESBuffers, size_t maxMemory, int priority, int stackSize);
 
     // virtual methods to override from ADGenICam
     void report(FILE *fp, int details);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
-    virtual GenICamFeature *createFeature(GenICamFeatureSet *set, 
+    virtual GenICamFeature *createFeature(GenICamFeatureSet *set,
                                           std::string const & asynName, asynParamType asynType, int asynIndex,
                                           std::string const & featureName, GCFeatureType_t featureType);
-    
+
     void processFrame(ScopedBuffer &buf);
     EGRABBER_CALLBACK *getGrabber();
     void shutdown();
 
 private:
+
+    /* parameters */
     int ESTimeStampMode;
 #define FIRST_ES_PARAM ESTimeStampMode
     int ESUniqueIdMode;
@@ -68,6 +76,7 @@ private:
 
     /* Data */
     EGRABBER_CALLBACK *mGrabber_;
+    std::shared_ptr<EGenTL> pGenTL_;
     int numEGBuffers_;
     int bitsPerPixel_;
     int exiting_;
